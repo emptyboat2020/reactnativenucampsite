@@ -22,10 +22,11 @@ const HomeNavigator = () => {
             <Stack.Screen
                 name='Home'
                 component={HomeScreen}
-                onPress={() => navigation.toggleDrawer()}
-                options={({ navigation }) => ({
-                    title: 'Home'
-                })}
+                // onPress={() => navigation.toggleDrawer()}
+                // options={({ navigation }) => ({
+                //     title: 'Home'
+                // })}
+                //
             />
         </Stack.Navigator>
     );
@@ -61,7 +62,7 @@ const ContactNavigator = () => {
 const DirectoryNavigator = () => {
     const Stack = createStackNavigator();
     return (
-        <Stack.DirectoryNavigator
+        <Stack.Navigator
             initialRouteName='Directory'
             screenOptions={screenOptions}
         >
@@ -73,11 +74,11 @@ const DirectoryNavigator = () => {
             <Stack.Screen
                 name='CampsiteInfo'
                 component={CampsiteInfoScreen}
-                options={(route) => ({
+                options={({route}) => ({
                     title: route.params.campsite.name
                 })}
             />
-        </Stack.DirectoryNavigator>
+        </Stack.Navigator>
     );
 };
 
