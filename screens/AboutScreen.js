@@ -1,7 +1,8 @@
 import { ScrollView } from "react-native";
 import { Card, Avatar, Text, ListItem } from "react-native-elements";
-import { PARTNERS } from "../shared/partners";
-import { useState } from "react";
+import { useSelector } from "react-redux";
+import { baseUrl } from "../shared/baseUrl";
+import Loading from "../components/LoadingComponents"; 
 
 function Mission() {
     return (
@@ -11,20 +12,46 @@ function Mission() {
                 <Text style={{ margin: 10 }}>We present a curated database of the best campsites in the vast woods and backcountry of the World Wide Web Wilderness. We increase access to adventure for the public while promoting safe and respectful use of resources. The expert wilderness trekkers on our staff personally verify each campsite to make sure that they are up to our standards. We also present a platform for campers to share reviews on campsites they have visited with each other.
                 </Text>
         </Card>
-    )
+    );
 }
 
 const AboutScreen =  () => {
-    const [partners, setPartners] = useState(PARTNERS);
+    const partners = useSelector((state) => state.partners);
+
+    if (partners.isLoading){
+        return( 
+        <ScrollView>
+            <Mission />
+            <Card>
+            <Card.Title>Community Partners</Card.Title>
+                <Card.Divider />
+                <Loading />
+            </Card> 
+    </ScrollView>
+        )
+    }
+    if(partners.errMess) {
+        return (
+            <ScrollView>
+                <Mission />
+                <Card>
+                <Card.Title>Community Partners</Card.Title>
+                    <Card.Divider />
+                    <Text>{partners.errMess}</Text>
+                </Card> 
+        </ScrollView>
+        )
+
+    }
     return (
         <ScrollView>
                 <Mission />
                 <Card>
                 <Card.Title>Community Partners</Card.Title>
                     <Card.Divider />
-                    {partners.map((partner) => (
+                    {partners.partnersArray.map((partner) => (
                             <ListItem key={partner.id}>
-                                <Avatar source={partner.image} rounded/>
+                                <Avatar rounded source={{ uri: baseUrl + partner.image }} />
                                 <ListItem.Content>
                                     <ListItem.Title>{partner.name}</ListItem.Title>
                                     <ListItem.Subtitle>{partner.description}</ListItem.Subtitle>
