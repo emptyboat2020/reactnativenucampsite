@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, Image, ScrollView, StyleSheet } from "react-native";
 import { Button, Icon,CheckBox, Input } from "react-native-elements";
 import * as SecureStore from 'expo-secure-store';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import * as ImagePicker from 'expo-image-picker';
+import { baseUrl } from "../shared/baseUrl";
+import logo from '../assets/images/logo.png';
 
 const LoginTab =({ navigation }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [remember, setRemember] = useState('');
+    const [remember, setRemember] = useState('false');
 
     const handleLogin = () => {
         console.log('username:', username);
@@ -62,11 +65,11 @@ const LoginTab =({ navigation }) => {
                 onPress={()=> setRemember(!remember)}
                 containerStyle={styles.formCheckBox}
             />
-            <View>
+            <View style={styles.formButton}>
                 <Button
                     onPress={() => handleLogin()}
                     title='Login'
-                    color= '#567DD'
+                    color= '#5637DD'
                     icon={
                         <Icon
                             name='sign-in'
@@ -76,8 +79,7 @@ const LoginTab =({ navigation }) => {
                         />
                     }
                     buttonStyle={{ backgroundColor: '#5637DD' }}
-                >
-                </Button>
+                />
                 </View>
                 <View style={styles.formButton}>
                     <Button
@@ -105,7 +107,10 @@ const RegisterTab = () => {
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [remember, setRemember] = useState(false);
-    const RegisterLogin = () => {
+    const [imageUrl, setImageUrl] = useState(baseUrl + 'images/logo.png');
+
+
+    const handleRegister = () => {
         const userInfo = {
             username,
             password,
@@ -128,8 +133,32 @@ const RegisterTab = () => {
             console.log('Could not delete user info', error));
         }
     };
+    const getImageFromCamera = async () => {
+        const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+        
+        if(cameraPermission.status === 'granted') {
+            const capturedImage = await ImagePicker.launchCameraAsync({
+                allowEditing: true,
+                asspect: [1, 1]
+            });
+            if (!capturedImage.cancelled) {
+                console.log(capturedImage);
+                setImageUrl(capturedImage.uri);
+            }
+        }
+    }
+
     return (<ScrollView>
         <View style={styles.container}>
+            <View style={styles.imageContainer}>
+                <Image 
+                    source = {{ uri: imageUrl }}
+                    loadingIndicatorSource={logo}
+                    style={styles.image}
+                />
+                <Button title='Camera' onPress={getImageFromCamera}/>
+            </View>
+
             <Input 
                 placeholder="Username"
                 leftIcon={{ type: 'font-awesome', name: 'user-o'}}
@@ -150,7 +179,7 @@ const RegisterTab = () => {
                 placeholder="First Name"
                 leftIcon={{ type: 'font-awesome', name: 'key'}}
                 onChangeText={(text) => setFirstName(text)}
-                value={password}
+                value={firstName}
                 containerStyle={styles.formInput}
                 leftIconContainerStyle={styles.formIcon}
             />
@@ -181,7 +210,7 @@ const RegisterTab = () => {
                 <Button
                     onPress={() => handleRegister()}
                     title='Register'
-                    color= '#567DD'
+                    color= '#5637DD'
                     icon={
                         <Icon
                             name='user-plus'
@@ -191,10 +220,8 @@ const RegisterTab = () => {
                         />
                     }
                     buttonStyle={{ backgroundColor: '#5637DD' }}
-                >
-                </Button>
-                </View>
-                
+                />
+                </View>    
         </View>
     </ScrollView>)
 };
@@ -267,6 +294,17 @@ const styles = StyleSheet.create({
         margin: 20,
         marginRight: 40,
         marginLeft: 40
+    },
+    imageContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
+        margin: 10
+    },
+    image: {
+        width: 60,
+        height: 60
     }
 });
 
